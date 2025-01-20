@@ -1,0 +1,182 @@
+﻿@using PDFGenConsole.Invoices
+@inherits LayoutComponentBase
+
+@code {
+    [Parameter]
+    public Invoice Invoice { get; set; } = new Invoice();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Invoice # @Invoice.Number</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+
+        .invoice-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            padding: 0;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .header-left {
+            font-size: 1.2rem;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .address-section {
+            margin-bottom: 1rem;
+        }
+
+            .address-section h3 {
+                margin-bottom: 0.5rem;
+                font-size: 1rem;
+            }
+
+        .invoice-dates {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+            .invoice-dates span {
+                display: inline-block;
+                margin-right: 2rem;
+            }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+            .items-table thead {
+                background-color: #eee;
+            }
+
+            .items-table th, .items-table td {
+                padding: 0.8rem;
+                border-bottom: 1px solid #ddd;
+                text-align: left;
+            }
+
+            .items-table th {
+                font-weight: bold;
+            }
+
+            .items-table .text-right {
+                text-align: right;
+            }
+
+        .comments-section {
+            margin-top: 1rem;
+            font-style: italic;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="header-section">
+            <div class="header-left">
+                <h2>Invoice #@Invoice.Number</h2>
+                <div class="invoice-dates">
+                    <span>Issue Date: @Invoice.IssueDate.ToShortDateString()</span>
+                    <span>Due Date: @Invoice.DueDate.ToShortDateString()</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <h3>@Invoice.SellerAddress?.CompanyName</h3>
+                <p>
+                    @Invoice.SellerAddress?.Street<br />
+                    @Invoice.SellerAddress?.City, @Invoice.SellerAddress?.PostalCode<br />
+                    @Invoice.SellerAddress?.Country
+                </p>
+                <p>
+                    Phone: @Invoice.SellerAddress?.Phone<br />
+                    Email: @Invoice.SellerAddress?.Email<br />
+                    Website: @Invoice.SellerAddress?.Website
+                </p>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="address-section">
+            <h3>Bill To:</h3>
+            <p>
+                <strong>@Invoice.CustomerAddress?.CompanyName</strong><br />
+                @Invoice.CustomerAddress?.Street<br />
+                @Invoice.CustomerAddress?.City, @Invoice.CustomerAddress?.PostalCode<br />
+                @Invoice.CustomerAddress?.Country
+            </p>
+            <p>
+                Phone: @Invoice.CustomerAddress?.Phone<br />
+                Email: @Invoice.CustomerAddress?.Email<br />
+                Website: @Invoice.CustomerAddress?.Website
+            </p>
+        </div>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th class="text-right">Price</th>
+                    <th class="text-right">Quantity</th>
+                    <th class="text-right">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Invoice.Items != null && Invoice.Items.Count > 0)
+                {
+                    foreach (var item in Invoice.Items)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td class="text-right">@item.Price.ToString("C")</td>
+                            <td class="text-right">@item.Quantity</td>
+                            <td class="text-right">@((item.Price * item.Quantity).ToString("C"))</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4">No items found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        @if (!string.IsNullOrEmpty(Invoice.Comments))
+        {
+            <div class="comments-section">
+                <strong>Comments:</strong> @Invoice.Comments
+            </div>
+        }
+    </div>
+</body>
+</html>
